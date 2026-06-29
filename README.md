@@ -46,7 +46,7 @@ docker compose down
 | backend  | Node.js API server        | 3001 |
 | db       | PostgreSQL database       | 5432 |
 
-## 📸 Screenshots
+##  Screenshots
 
 ### App Running in Browser
 
