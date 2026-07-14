@@ -68,3 +68,36 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_DB=dreamvacation
 DATABASE_URL=postgresql://postgres:postgres@db:5432/dreamvacation
+
+
+##  CI/CD Pipeline
+
+This project uses GitHub Actions to automatically build and push Docker images to Docker Hub on every push to `main` or `dev`.
+
+### How it works
+
+1. You push code to GitHub
+2. GitHub Actions automatically triggers
+3. It builds the Docker image for that service
+4. It pushes the image to Docker Hub with two tags:
+   - `latest` — always the most recent build
+   - `<commit-sha>` — unique tag for that specific push
+
+### Workflow files
+
+| File | What it does |
+|---|---|
+| `.github/workflows/backend.yml` | Builds and pushes the backend image |
+| `.github/workflows/frontend.yml` | Builds and pushes the frontend image |
+
+### Secrets required
+
+| Secret | Description |
+|---|---|
+| `DOCKER_USERNAME` | Your Docker Hub username |
+| `DOCKER_TOKEN` | Your Docker Hub access token |
+
+### Docker Hub Images
+
+- `dubemdaniel/dream-vacation-backend`
+- `dubemdaniel/dream-vacation-frontend`
