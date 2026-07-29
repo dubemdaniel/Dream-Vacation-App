@@ -101,3 +101,57 @@ This project uses GitHub Actions to automatically build and push Docker images t
 
 - `dubemdaniel/dream-vacation-backend`
 - `dubemdaniel/dream-vacation-frontend`
+
+##  AWS Deployment
+
+The app is deployed to an AWS EC2 instance using the CI/CD pipeline.
+
+### AWS Infrastructure
+
+| Resource | Name | Details |
+|---|---|---|
+| VPC | dream-vpc | CIDR: 10.0.0.0/16 |
+| Subnet | dream-subnet | CIDR: 10.0.1.0/24, us-east-1a |
+| Internet Gateway | dream-igw | Attached to dream-vpc |
+| Route Table | dream-rt | Associated with dream-subnet |
+| EC2 Instance | dream-server | Ubuntu 24.04, t3.micro |
+| Security Group | dream-sg | Ports: 22, 80, 3001 |
+
+### Live App
+Visit: http://13.222.19.192
+
+### Screenshots
+
+#### VPC
+![VPC](screenshots/vpc.png)
+
+*Custom VPC created for the Dream Vacation App.*
+
+#### Subnet
+![Subnet](screenshots/subnet.png)
+
+*Public subnet inside the VPC in us-east-1a availability zone.*
+
+#### EC2 Instance Running
+![EC2](screenshots/ec2-instance.png)
+
+*EC2 instance running Ubuntu 24.04 with Docker installed.*
+
+#### App Deployed on EC2
+![App](screenshots/app-deployed.png)
+
+*Dream Vacation App running live on the EC2 public IP.*
+
+#### CI/CD Pipeline Success
+![Pipeline](screenshots/pipeline.png)
+
+*GitHub Actions pipeline successfully building and deploying to EC2.*
+
+### How Deployment Works
+
+Every time code is pushed to `main`:
+1. GitHub Actions builds the Docker images
+2. Pushes them to Docker Hub
+3. SSHs into the EC2 instance
+4. Pulls the latest code
+5. Restarts the containers with docker-compose
