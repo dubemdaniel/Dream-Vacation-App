@@ -92,16 +92,11 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo apt-get install -y docker-compose
-            sudo usermod -aG docker ubuntu
+            sudo apt-get install -y docker-compose git
             if [ ! -d ~/Dream-Vacation-App ]; then
               git clone https://github.com/dubemdaniel/Dream-Vacation-App.git ~/Dream-Vacation-App
             fi
             cd ~/Dream-Vacation-App
             git pull origin main
             sudo docker-compose down
-            sudo docker-compose up --build -dscript: |
-            cd ~/Dream-Vacation-App
-            git pull origin main
-            docker-compose down
-            docker-compose up --build -d
+            sudo docker-compose up --build -d
