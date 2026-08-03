@@ -155,3 +155,64 @@ Every time code is pushed to `main`:
 3. SSHs into the EC2 instance
 4. Pulls the latest code
 5. Restarts the containers with docker-compose
+
+
+## Terraform Deployment (Stage 7)
+
+Infrastructure is provisioned using Terraform (Infrastructure as Code).
+
+### Terraform Files
+
+| File | What it does |
+|---|---|
+| `terraform/main.tf` | Creates VPC, Subnet, IGW, Route Table, Security Group, EC2, CloudWatch |
+| `terraform/variables.tf` | Defines reusable variables |
+| `terraform/outputs.tf` | Outputs EC2 IP, VPC ID, Subnet ID after apply |
+
+### How to Deploy Infrastructure
+
+```bash
+cd terraform
+terraform init
+terraform plan
+terraform apply
+```
+
+### What Terraform Creates
+
+| Resource | Name | Details |
+|---|---|---|
+| VPC | dream-vpc | CIDR: 10.0.0.0/16 |
+| Subnet | dream-subnet | CIDR: 10.0.1.0/24, us-east-1a |
+| Internet Gateway | dream-igw | Attached to dream-vpc |
+| Route Table | dream-rt | Routes traffic to internet |
+| EC2 Instance | dream-server | Ubuntu 24.04, t3.micro |
+| Security Group | dream-sg | Ports: 22, 80, 3001 |
+| CloudWatch Alarm | dream-cpu-alarm | Triggers when CPU > 80% |
+
+### Screenshots
+
+#### VPC (created by Terraform)
+![VPC](screenshots/terraform-vpc.png)
+
+*VPC created automatically by Terraform.*
+
+#### Subnet (created by Terraform)
+![Subnet](screenshots/terraform-subnet.png)
+
+*Public subnet in us-east-1a created by Terraform.*
+
+#### EC2 Instance Running
+![EC2](screenshots/terraform-ec2.png)
+
+*EC2 instance provisioned by Terraform running Ubuntu 24.04.*
+
+#### App Deployed
+![App](screenshots/terraform-app.png)
+
+*Dream Vacation App running on the Terraform-provisioned EC2 instance.*
+
+#### CloudWatch CPU Alarm
+![CloudWatch](screenshots/terraform-cloudwatch.png)
+
+*CloudWatch alarm monitoring CPU utilization on the EC2 instance.*
