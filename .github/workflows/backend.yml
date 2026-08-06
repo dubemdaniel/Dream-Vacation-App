@@ -32,8 +32,6 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     needs: build-and-push
-    outputs:
-      ec2_ip: ${{ steps.tf_output.outputs.ec2_ip }}
 
     steps:
       - name: Checkout code
@@ -60,23 +58,6 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
         run: terraform plan
 
-      - name: Terraform Apply
-        working-directory: terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
-        run: terraform apply -auto-approve
-
-      - name: Get EC2 IP
-        id: tf_output
-        working-directory: terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
-        run: echo "ec2_ip=$(terraform output -raw ec2_public_ip)" >> $GITHUB_OUTPUT
-
   deploy:
     runs-on: ubuntu-latest
     needs: terraform
@@ -88,29 +69,10 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ needs.terraform.outputs.ec2_ip }}
+          host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sleep 60
-            sudo killall apt-get || true
-            sudo killall dpkg || true
-            sudo rm -f /var/lib/apt/lists/lock
-            sudo rm -f /var/lib/dpkg/lock-frontend
-            sudo rm -f /var/cache/apt/archives/lock
-            sudo apt-get update -y
-            sudo apt-get install -y ca-certificates curl gnupg git
-            sudo install -m 0755 -d /etc/apt/keyrings
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-            sudo chmod a+r /etc/apt/keyrings/docker.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-            sudo apt-get update -y
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-            sudo systemctl start docker
-            sudo systemctl enable docker
-            if [ ! -d ~/Dream-Vacation-App ]; then
-              git clone https://github.com/dubemdaniel/Dream-Vacation-App.git ~/Dream-Vacation-App
-            fi
             cd ~/Dream-Vacation-App
             git pull origin main
             sudo docker compose down
