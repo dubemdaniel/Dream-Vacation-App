@@ -215,4 +215,9 @@ terraform apply
 #### CloudWatch CPU Alarm
 ![CloudWatch](screenshots/terraform-cloudwatch.png)
 
+#### CI/CD Pipeline Success (with Terraform)
+![Pipeline](screenshots/terraform-pipeline.png)
+
+*GitHub Actions pipeline showing successful build, Terraform plan, and deployment to EC2.*
+
 *CloudWatch alarm monitoring CPU utilization on the EC2 instance.*
